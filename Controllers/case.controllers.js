@@ -21,8 +21,14 @@ const createCase = async (req, res) => {
     OrderMessages,
     lab,
   } = req.body;
-  // console.log("lab: ", lab);
+  
   try {
+    // Check if a case with the same caseID already exists
+    const existingCase = await caseSchema.findOne({ caseID });
+    if (existingCase) {
+      return res.status(400).json({ message: "Case ID already exists. Please use a unique Case ID." });
+    }
+
     const newCase = new caseSchema({
       caseID,
       DentalLab,
@@ -41,15 +47,21 @@ const createCase = async (req, res) => {
       Message,
       isApproved,
       OrderMessages,
-      lab: lab._id,
+      lab: lab?._id,
     });
     await newCase.save();
     res.status(201).json({ message: "Case created successfully" });
   } catch (error) {
     console.log("createCase controller causing error: ", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+
+
+
+
+////////////////////////////////////////////////////////////////
 
 const getCases = async (req, res) => {
   try {
@@ -61,6 +73,8 @@ const getCases = async (req, res) => {
   }
 };
 
+///////////////////////////////////////////////////////////////
+
 const getCase = async (req, res) => {
   const { caseID } = req.params;
   try {
@@ -71,6 +85,8 @@ const getCase = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+/////////////////////////////////////////////////////////////
 
 const updateCase = async (req, res) => {
   const { caseID } = req.params;
@@ -87,6 +103,9 @@ const updateCase = async (req, res) => {
   }
 };
 
+
+///////////////////////////////////////////////////////////////
+
 const deleteCase = async (req, res) => {
   const { caseID } = req.params;
   try {
@@ -101,6 +120,12 @@ const deleteCase = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+/////////////////////////////////////////////////////////////////////
+
+
 
 const sendMesage = async (req, res) => {
   const { caseID } = req.params;
@@ -213,6 +238,8 @@ const updateStatus = async (req, res) => {
   }
 };
 
+
+
 const updateDesignApproval = async (req, res) => {
   const { caseID } = req.params;
   const { DesignApproval } = req.body;
@@ -228,6 +255,8 @@ const updateDesignApproval = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 const updateDestination = async (req, res) => {
   const { caseID } = req.params;
@@ -245,6 +274,10 @@ const updateDestination = async (req, res) => {
   }
 };
 
+
+///////////////////////////////////////////////////////
+
+
 const updateMessage = async (req, res) => {
   const { caseID } = req.params;
   const { Message } = req.body;
@@ -260,6 +293,9 @@ const updateMessage = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+////////////////////////////////////////
 
 const AddTeethData = async (req, res) => {
   const { caseID } = req.params;

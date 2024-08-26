@@ -2,6 +2,9 @@ import bcrypt from "bcryptjs";
 import User from "../Models/user.model.js";
 import generateWebTokens from "../utils/jwtTokenWithCookies.js";
 
+
+
+
 const signupController = async (req, res) => {
   const { userName, fullName, password, confirmPassword, role } =
     req.body;
@@ -31,6 +34,8 @@ const signupController = async (req, res) => {
     console.log("signup controller causing error: ", error);
   }
 };
+
+
 
 const loginController = async (req, res) => {
   const { userName, password } = req.body;

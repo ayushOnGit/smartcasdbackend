@@ -20,7 +20,6 @@ app.use(bodyParser.json({ limit: '20mb' }));
 app.use('/auth', authRoutes);
 app.use('/case', caseRoutes);
 app.use('/aws', AWSRoutes);
-
 app.use('/lab', labRoutes);
 
 

@@ -15,11 +15,13 @@ const caseSchema = new mongoose.Schema({
    
     default: "In House",
   },
+
   Status: {
     type: String,
-  
+    default : 'Case Initiated',
     Enum: ["Pending", "Completed", "Shipped", "Hold", "Rush", "Design Approval", "Design Rejected"],
   },
+
   DesignApproval: {
     type: Boolean,
     default: false,
@@ -28,10 +30,16 @@ const caseSchema = new mongoose.Schema({
     type: String,
  
   },
+
   fileURL: {
     type: String,
-    
   },
+
+  DesignerName: {
+    default : 'not assigned',
+    type: String,
+  },
+
   TeethData: [
     {
       ToothNumber: {
