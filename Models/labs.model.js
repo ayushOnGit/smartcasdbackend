@@ -39,7 +39,7 @@ const labSchema = new Schema({
     sironaInEOSSTL: { type: Boolean, default: false },
     other: { type: Boolean, default: false }
   },
-  users: [labUserSchema]  // Array of lab users
+  users: [labUserSchema]  
 });
 
 export default mongoose.model("Lab", labSchema);

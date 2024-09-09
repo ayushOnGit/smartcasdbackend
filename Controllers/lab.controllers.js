@@ -39,7 +39,8 @@ const createLab = async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-    };
+
+}
 
     const labLogin = async (req, res) => {
         try {

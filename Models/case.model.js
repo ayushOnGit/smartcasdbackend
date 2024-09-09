@@ -4,7 +4,7 @@ const caseSchema = new mongoose.Schema({
   caseID: {
     type: String,
     required: true,
-    unique: true,
+    // unique: true,
   },
   DentalLab: {
     type: String,

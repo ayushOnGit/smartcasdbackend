@@ -146,10 +146,11 @@ const sendMesage = async (req, res) => {
     );
     res.status(200).json(updatedCase);
   } catch (error) {
-    console.log("sendMesage controller causing error: ", error);
+    console.error("sendMesage controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const approveCase = async (req, res) => {
   const { caseID } = req.params;
