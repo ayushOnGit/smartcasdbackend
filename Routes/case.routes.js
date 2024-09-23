@@ -1,4 +1,4 @@
-import   { createCase, getCases, getCase, updateCase, deleteCase, sendMesage, approveCase, getApprovedCases, getPendingCases, getCompletedCases, getShippedCases, updateTAT, updateStatus, updateDesignApproval, updateDestination, updateMessage, AddTeethData } from '../controllers/case.controllers.js';
+import   { createCase, getCases, getCase, updateCase, deleteCase, sendMesage, approveCase, getApprovedCases, getPendingCases, getCompletedCases, getShippedCases, updateTAT, updateStatus, updateDesignApproval, updateDestination, updateMessage, AddTeethData,updateDesignerName } from '../controllers/case.controllers.js';
 import express from 'express';
 const router = express.Router();
 
@@ -19,5 +19,7 @@ router.put('/updatedesignapproval/:caseID', updateDesignApproval);
 router.put('/updatedestination/:caseID', updateDestination);
 router.put('/updatemessage/:caseID', updateMessage);
 router.put('/addteethdata/:caseID', AddTeethData);
+router.patch('/designer',updateDesignerName);
+
 
 export default router;

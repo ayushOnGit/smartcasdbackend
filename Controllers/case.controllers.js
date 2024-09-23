@@ -56,6 +56,42 @@ const createCase = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+/////////////////////////////////////////////////////////////////
+
+
+
+export const updateDesignerName = async (req, res) => {
+  try {
+    const { caseID, designerName } = req.body;
+    console.log('Request body:', req.body); // Log request body to ensure it's received properly
+
+    if (!caseID || !designerName) {
+      return res.status(400).json({ message: "caseID and designerName are required" });
+    }
+
+    const updatedCase = await caseSchema.findOneAndUpdate(
+      { caseID: caseID }, 
+      { DesignerName: designerName }, 
+      { new: true }
+    );
+
+    if (!updatedCase) {
+      return res.status(404).json({ message: "Case not found" });
+    }
+
+    res.status(200).json({
+      message: "Designer name updated successfully",
+      updatedCase,
+    });
+  } catch (error) {
+    console.error('Error during designer update:', error); // Log error details
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 
 
 

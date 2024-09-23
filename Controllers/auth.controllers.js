@@ -4,18 +4,23 @@ import generateWebTokens from "../utils/jwtTokenWithCookies.js";
 
 
 
-
 const signupController = async (req, res) => {
-  const { userName, fullName, password, confirmPassword, role } =
-    req.body;
-  try {
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Password Don't match" });
-    }
-    const user = await User.findOne({ userName });
+  const { userName, email, phoneNumber, designation, password, confirmPassword, role } = req.body;
 
-    if (user) {
-      return res.status(401).json({ message: "User already exists" });
+  console.log("Request body: ", req.body);
+
+  try {
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ message: "Password and Confirm Password are required" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords don't match" });
+    }
+
+    const existingUser = await User.findOne({ $or: [{ userName }, { email }] });
+    if (existingUser) {
+      return res.status(401).json({ message: "User with this username or email already exists" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -23,41 +28,98 @@ const signupController = async (req, res) => {
 
     const newUser = new User({
       userName,
-      fullName,
+      email,
+      phoneNumber,
+      designation,
       password: hashedPassword,
-      role,
+      role
     });
-    generateWebTokens(newUser._id, res);
+
     await newUser.save();
-    res.status(201).json({ message: "signup successfull!!" });
+
+    generateWebTokens(newUser._id, res);
+
+    res.status(201).json({ message: "Signup successful!" });
   } catch (error) {
-    console.log("signup controller causing error: ", error);
+    console.error("Signup controller error: ", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 
 
+
+
+
+// const loginController = async (req, res) => {
+//   const { userName, password } = req.body;
+  
+//   try {
+//     const user = await User.findOne({ userName });
+//     if (!user) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+//     const isPasswordValid = await bcrypt.compare(
+//       password,
+//       user?.password || ""
+//     );
+    
+//     if (!isPasswordValid) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+//     generateWebTokens(user._id, res);
+//     res.status(200).json({ 
+//       message: "Login successful!", 
+//       role: user.role // Sending the user's role in the response
+//     });
+    
+//   } catch (error) {
+//     console.log("login controller causing error: ", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
+
 const loginController = async (req, res) => {
-  const { userName, password } = req.body;
+  const { email, password } = req.body;
+  console.log('requested body for login',req.body)
+  
   try {
-    const user = await User.findOne({ userName });
+    // Find the user by userName
+    const user = await User.findOne({ email });
+
+    // If user is not found
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user?.password || ""
-    );
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+
+    // Check if the password is valid
+    // const isPasswordValid = await bcrypt.compare(
+    //   password,
+    //   user?.password || ""
+    // );
+    
+    const isPasswordValid = await bcrypt.compare(password, user?.password || "");
+    console.log('Password comparison:', isPasswordValid);  // Log the result of the comparison
+    
+
+    // Generate JWT and send tokens
     generateWebTokens(user._id, res);
-    res.status(200).json({ message: "login successfull!!" });
+
+    // Send success response with the role
+    res.status(200).json({ 
+      message: "Login successful!", 
+      role: user.role ,// Fetching the user's role from the database
+      name : email
+    });
+    
   } catch (error) {
     console.log("login controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 const logoutController = async (req, res) => {
   try {
