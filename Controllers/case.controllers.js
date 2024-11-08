@@ -1,4 +1,5 @@
 import caseSchema from "../Models/case.model.js";
+import labSchema from "../Models/labs.model.js";
 
 const createCase = async (req, res) => {
   const {
@@ -31,7 +32,7 @@ const createCase = async (req, res) => {
 
     const newCase = new caseSchema({
       caseID,
-      DentalLab,
+      DentalLab: lab?._id,
       Destination,
       Status,
       DesignApproval,
@@ -56,6 +57,8 @@ const createCase = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+
 /////////////////////////////////////////////////////////////////
 
 
@@ -102,12 +105,44 @@ export const updateDesignerName = async (req, res) => {
 const getCases = async (req, res) => {
   try {
     const cases = await caseSchema.find().populate("lab");
+    console.log('can we have the cases with lab',cases)
     res.status(200).json(cases);
   } catch (error) {
     console.log("getCases controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+
+// const getCasesbylab = async (req, res) => {
+//   const { labName } = req.params;
+
+//   try {
+//     const cases = await caseSchema.aggregate([
+//       {
+//         $match: {
+//           "lab.labName": labName // Match the `labName` directly in the embedded `lab` field
+//         }
+//       },
+//       {
+//         $project: {
+//           lab: 0 // Exclude `lab` field if it's not needed in the result
+//         }
+//       }
+//     ]);
+    
+    
+
+//     res.status(200).json(cases);
+//     console.log('labdetails from lab route controller',cases)
+//   } catch (error) {
+//     console.log("getCases controller causing error: ", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
 
 ///////////////////////////////////////////////////////////////
 
@@ -116,6 +151,7 @@ const getCase = async (req, res) => {
   try {
     const Case = await caseSchema.findOne({ caseID }).populate("lab");
     res.status(200).json(Case);
+    console.log('if cases are there',Case)
   } catch (error) {
     console.log("getCase controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
@@ -263,18 +299,64 @@ const updateStatus = async (req, res) => {
   const { caseID } = req.params;
   const { Status } = req.body;
   try {
-    const updatedCase = await caseSchema.findOneAndUpdate(
-      { caseID },
-      { Status },
-      { new: true }
-    );
-    res.status(200).json(updatedCase);
+    // const updatedCase = await caseSchema.findOneAndUpdate(
+    //   { caseID },
+    //   { Status },
+    //   { new: true }
+    // );
+    // res.status(200).json(updatedCase);
+    const updatedCase = await caseSchema.findById(caseID);
+    if (updatedCase) {
+      updatedCase.Status = Status;
+      await updatedCase.save();
+      res.status(200).json(updatedCase);
+    }
+    else {
+      res.status(404).json({ message: "Case not found" });
+    }
   } catch (error) {
     console.log("updateStatus controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+
+const updateRPDFramework = async (req, res) => {
+  const { caseID } = req.params;
+  const { RPDFramework } = req.body;
+  try {
+    const updatedCase = await caseSchema.findById(caseID);
+    if (updatedCase) {
+      updatedCase.RPDFramework = RPDFramework;
+      await updatedCase.save();
+      res.status(200).json(updatedCase);
+    }
+    else {
+      res.status(404).json({ message: "Case not found" });
+    }
+  } catch (error) {
+    console.log("updateRPDFramework controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+const updateCustomTray = async (req, res) => {
+  const { caseID } = req.params;
+  const { customTray } = req.body;
+  try {
+    const updatedCase = await caseSchema.findById(caseID);
+    if (updatedCase) {
+      updatedCase.customTray = customTray;
+      await updatedCase.save();
+      res.status(200).json(updatedCase);
+    }
+    else {
+      res.status(404).json({ message: "Case not found" });
+    }
+  } catch (error) {
+    console.log("updateCustomTray controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 
 const updateDesignApproval = async (req, res) => {
@@ -358,6 +440,67 @@ const AddTeethData = async (req, res) => {
   }
 };
 
+export const updateQC = async (req, res) => {
+  const { caseID } = req.params;
+  const { QCName } = req.body;
+  try {
+      const updatedCase = await caseSchema.findOneAndUpdate(
+          { caseID: caseID },
+          { QCName: QCName },
+          { new: true }
+      );
+      if (!updatedCase) {
+          return res.status(404).json({ message: "Case not found" });
+      }
+      res.status(200).json({ message: "QCName updated successfully", updatedCase });
+  } catch (error) {
+      res.status(500).json({ message: "Error updating QCName", error: error.message });
+  }
+};
+
+
+
+
+
+export const getCasesByLabName = async (req, res) => {
+  try {
+    const { labName } = req.query; // Retrieve labName from query parameters
+    const normalizedLabName = labName.trim(); // Normalize the labName input
+
+    // Find the Lab document by its labName
+    const lab = await labSchema.findOne({ labName: normalizedLabName });
+    console.log('Lab found:', lab);
+
+    if (!lab) {
+      return res.status(404).json({ message: "Lab not found." });
+    }
+
+    // Log the lab ID without the 'new ObjectId()' wrapper
+    console.log('Lab ID:', lab._id.toString()); // Convert to string for clearer logging
+
+    // Find cases where the DentalLab field matches the lab's _id 66fcf42b21ba95ae44943f01
+    const cases = await caseSchema.find({ DentalLab: lab._id })
+      .populate({
+        path: 'DentalLab',
+        select: 'labName', // Only select the labName field from the Lab schema
+      });
+
+    console.log('Cases found:', cases);
+
+    if (!cases.length) {
+      return res.status(404).json({ message: "No cases found for the specified lab." });
+    }
+
+    return res.status(200).json(cases);
+  } catch (error) {
+    console.error("Error retrieving cases:", error);
+    return res.status(500).json({ message: "Server error. Unable to retrieve cases." });
+  }
+};
+
+
+
+
 export {
   createCase,
   getCases,
@@ -376,108 +519,7 @@ export {
   updateDestination,
   updateMessage,
   AddTeethData,
+  updateRPDFramework,
+  updateCustomTray,
 };
 
-//     import mongoose from "mongoose";
-
-// const caseSchema = new mongoose.Schema({
-//   caseID: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//   },
-//   DentalLab: {
-//     type: String,
-//     required: true,
-//   },
-//   Destination: {
-//     type: String,
-//     required: true,
-//     default: "In House",
-//   },
-//   Status: {
-//     type: String,
-//     required: true,
-//     Enum: ["Pending", "Completed", "Shipped"],
-//   },
-//   DesignApproval: {
-//     type: Boolean,
-//     required: true,
-//   },
-//   fileName: {
-//     type: String,
-//     required: true,
-//   },
-//   fileURL: {
-//     type: String,
-//     required: true,
-//   },
-//   TeethData: [
-//     {
-//       ToothNumber: {
-//         type: String,
-//         required: true,
-//       },
-//       DesignType: {
-//         type: String,
-//         required: true,
-//       },
-//       ToothMaterial: {
-//         type: String,
-//         required: true,
-//         Enum: ["Zirconia", "e.MAX CAD", "ArgenZ Esthetic Crown", "Wax", "Bruxzir", "Lava Zirconia"]
-//       },
-//     },
-//   ],
-//     IsDeleted: {
-//         type: Boolean,
-//         default: false,
-//     },
-//     TAT: {
-//         type: String,
-//         required: true,
-//         Enum: ["Next day at 7 am", "2 Hrs", "6 Hrs"]
-//     },
-//     Model: {
-//        type: Boolean,
-//          required: true,
-//     },
-//     customTray: {
-//         type: Boolean,
-//         required: true,
-//     },
-//     RPDFramework: {
-//         type: Boolean,
-//         required: true,
-//     },
-//     Abutment: {
-//         type: Number,
-//         required: true,
-//     },
-//     Message: {
-//         type: String,
-//     },
-//     isApproved: {
-//         type: Boolean,
-//         default: false,
-//     },
-//     OrderMessages: [
-//         {
-//             message: {
-//                 type: String,
-//                 required: true,
-//             },
-//             sender: {
-//                 type: String,
-//                 required: true,
-//             },
-//             date: {
-//                 type: Date,
-//                 default: Date.now,
-//             },
-//         },
-//     ],
-
-// });
-
-// export default mongoose.model("Case", caseSchema);

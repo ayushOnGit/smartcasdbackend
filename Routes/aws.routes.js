@@ -61,6 +61,7 @@ console.log(req.file);
 
 router.get("/download/:imageName", async function (req, res, next) {
   const imageName = req.params.imageName;
+  console.log('imagename')
   const params = {
     Bucket: AWS_BUCKET_NAME,
     Key: imageName,

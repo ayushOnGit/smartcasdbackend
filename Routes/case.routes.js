@@ -1,9 +1,11 @@
-import   { createCase, getCases, getCase, updateCase, deleteCase, sendMesage, approveCase, getApprovedCases, getPendingCases, getCompletedCases, getShippedCases, updateTAT, updateStatus, updateDesignApproval, updateDestination, updateMessage, AddTeethData,updateDesignerName } from '../controllers/case.controllers.js';
+import   { createCase,updateQC, getCases,updateRPDFramework,updateCustomTray,getCase, updateCase, deleteCase, sendMesage, approveCase, getApprovedCases, getPendingCases, getCompletedCases, getShippedCases, updateTAT, updateStatus, updateDesignApproval, updateDestination, updateMessage, AddTeethData,updateDesignerName,getCasesByLabName } from '../controllers/case.controllers.js';
 import express from 'express';
 const router = express.Router();
 
 router.post('/create', createCase);
 router.get('/get', getCases);
+// router.get('/getCasesbylab', getCasesbylab);
+router.get('/getcase',getCasesByLabName);
 router.get('/get/:caseID', getCase);
 router.put('/update/:caseID', updateCase);
 router.delete('/delete/:caseID', deleteCase);
@@ -20,6 +22,8 @@ router.put('/updatedestination/:caseID', updateDestination);
 router.put('/updatemessage/:caseID', updateMessage);
 router.put('/addteethdata/:caseID', AddTeethData);
 router.patch('/designer',updateDesignerName);
-
+router.put('/updateRPDFramework/:caseID', updateRPDFramework); //update RPD Framework of a case
+router.put('/updateCustomTray/:caseID', updateCustomTray);
+router.patch('/qcchange/:caseID',updateQC);
 
 export default router;
