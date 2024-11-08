@@ -63,6 +63,39 @@ const createCase = async (req, res) => {
 
 
 
+// export const updateDesignerName = async (req, res) => {
+//   try {
+//     const { caseID, designerName } = req.body;
+//     console.log('Request body:', req.body); // Log request body to ensure it's received properly
+
+//     if (!caseID || !designerName) {
+//       return res.status(400).json({ message: "caseID and designerName are required" });
+//     }
+
+//     const updatedCase = await caseSchema.findOneAndUpdate(
+//       { caseID: caseID }, 
+//       { DesignerName: designerName }, 
+//       { new: true }
+//     );
+
+//     if (!updatedCase) {
+//       return res.status(404).json({ message: "Case not found" });
+//     }
+
+//     res.status(200).json({
+//       message: "Designer name updated successfully",
+//       updatedCase,
+//     });
+//   } catch (error) {
+//     console.error('Error during designer update:', error); // Log error details
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 export const updateDesignerName = async (req, res) => {
   try {
     const { caseID, designerName } = req.body;
@@ -72,19 +105,24 @@ export const updateDesignerName = async (req, res) => {
       return res.status(400).json({ message: "caseID and designerName are required" });
     }
 
-    const updatedCase = await caseSchema.findOneAndUpdate(
-      { caseID: caseID }, 
-      { DesignerName: designerName }, 
+    // Ensure caseID is an array
+    if (!Array.isArray(caseID)) {
+      return res.status(400).json({ message: "caseID must be an array" });
+    }
+
+    const updatedCases = await caseSchema.updateMany(
+      { caseID: { $in: caseID } },  // Use $in to match any of the caseIDs in the array
+      { DesignerName: designerName },
       { new: true }
     );
 
-    if (!updatedCase) {
-      return res.status(404).json({ message: "Case not found" });
+    if (updatedCases.nModified === 0) {
+      return res.status(404).json({ message: "No cases found with the given caseIDs" });
     }
 
     res.status(200).json({
       message: "Designer name updated successfully",
-      updatedCase,
+      updatedCases,
     });
   } catch (error) {
     console.error('Error during designer update:', error); // Log error details
@@ -94,7 +132,6 @@ export const updateDesignerName = async (req, res) => {
     });
   }
 };
-
 
 
 
