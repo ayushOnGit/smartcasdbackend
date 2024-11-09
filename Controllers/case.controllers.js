@@ -21,6 +21,8 @@ const createCase = async (req, res) => {
     isApproved,
     OrderMessages,
     lab,
+    stlFiles,
+    finishedFiles
   } = req.body;
   
   try {
@@ -49,6 +51,8 @@ const createCase = async (req, res) => {
       isApproved,
       OrderMessages,
       lab: lab?._id,
+      stlFiles,
+      finishedFiles
     });
     await newCase.save();
     res.status(201).json({ message: "Case created successfully" });
@@ -61,7 +65,49 @@ const createCase = async (req, res) => {
 
 /////////////////////////////////////////////////////////////////
 
+export const updateStlFiles = async (req, res) => {
+  const { caseID, stlFiles } = req.body;
 
+  try {
+    // Find the case by caseID
+    const existingCase = await caseSchema.findOne({ caseID });
+    if (!existingCase) {
+      return res.status(404).json({ message: "Case not found" });
+    }
+
+    // Update the stlFiles field
+    existingCase.stlFiles = stlFiles;
+
+    // Save the updated case
+    await existingCase.save();
+    res.status(200).json({ message: "STL files updated successfully" });
+  } catch (error) {
+    console.log("updateStlFiles controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+export const updateFinishedFiles = async (req, res) => {
+  const { caseID, finishedFiles } = req.body;
+
+  try {
+    // Find the case by caseID
+    const existingCase = await caseSchema.findOne({ caseID });
+    if (!existingCase) {
+      return res.status(404).json({ message: "Case not found" });
+    }
+
+    // Update the finishedFiles field
+    existingCase.finishedFiles = finishedFiles;
+
+    // Save the updated case
+    await existingCase.save();
+    res.status(200).json({ message: "Finished files updated successfully" });
+  } catch (error) {
+    console.log("updateFinishedFiles controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 
 export const updateDesignerName = async (req, res) => {
   try {

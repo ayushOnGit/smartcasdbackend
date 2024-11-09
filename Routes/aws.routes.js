@@ -20,7 +20,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const randomImageName = (bytes = 32) => {
+const randomImageName = (bytes = 8) => {
   return crypto.randomBytes(bytes).toString("hex");
 };
 
@@ -39,7 +39,7 @@ router.post("/upload", upload.single("file"), async function (req, res, next) {
 console.log(req.file);
   const params = {
     Bucket: AWS_BUCKET_NAME,
-    Key: randomImageName(),
+    Key: req.file.originalname + randomImageName(),
     Body: req.file.buffer,
     ContentType: req.file.mimetype,
   };
