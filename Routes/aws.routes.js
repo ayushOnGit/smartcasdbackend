@@ -86,6 +86,6 @@ router.get("/download/:imageName", async function (req, res, next) {
     res.status(500).send("Error downloading file");
   }
 });
-
+}
 
 export default router;
