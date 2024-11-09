@@ -1,28 +1,30 @@
+import mongoose from "mongoose";
 import caseSchema from "../Models/case.model.js";
 import labSchema from "../Models/labs.model.js";
 
 const createCase = async (req, res) => {
   const {
     caseID,
-    DentalLab,
-    Destination,
-    Status,
-    DesignApproval,
+    DentalLab, // Assuming this is passed directly from the client
+    Destination = "In House", // Default value
+    Status = "Case Initiated", // Default value
+    DesignApproval = false, // Default value
     fileName,
     fileURL,
-    TeethData,
-    IsDeleted,
+    TeethData = [], // Default to empty array if not provided
+    IsDeleted = false, // Default value
     TAT,
     Model,
     customTray,
     RPDFramework,
     Abutment,
     Message,
-    isApproved,
-    OrderMessages,
-    lab,
+    isApproved = false, // Default value
+    OrderMessages = [], // Default to empty array if not provided
   } = req.body;
-  
+
+  console.log("Received data:", req.body);
+
   try {
     // Check if a case with the same caseID already exists
     const existingCase = await caseSchema.findOne({ caseID });
@@ -32,7 +34,7 @@ const createCase = async (req, res) => {
 
     const newCase = new caseSchema({
       caseID,
-      DentalLab: lab?._id,
+      DentalLab: DentalLab ? new mongoose.Types.ObjectId(DentalLab) : null, // Use 'new' with ObjectId
       Destination,
       Status,
       DesignApproval,
@@ -48,15 +50,17 @@ const createCase = async (req, res) => {
       Message,
       isApproved,
       OrderMessages,
-      lab: lab?._id,
     });
+
     await newCase.save();
-    res.status(201).json({ message: "Case created successfully" });
+    
+    res.status(201).json({ message: "Case created successfully", case: newCase });
   } catch (error) {
-    console.log("createCase controller causing error: ", error);
+    console.error("createCase controller causing error: ", error);
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
 
 
 /////////////////////////////////////////////////////////////////
@@ -142,7 +146,7 @@ export const updateDesignerName = async (req, res) => {
 const getCases = async (req, res) => {
   try {
     const cases = await caseSchema.find().populate("lab");
-    console.log('can we have the cases with lab',cases)
+    // console.log('can we have the cases with lab',cases)
     res.status(200).json(cases);
   } catch (error) {
     console.log("getCases controller causing error: ", error);
@@ -187,10 +191,30 @@ const getCase = async (req, res) => {
   const { caseID } = req.params;
   try {
     const Case = await caseSchema.findOne({ caseID }).populate("lab");
+
     res.status(200).json(Case);
-    console.log('if cases are there',Case)
+    // console.log('if cases are there',Case)
   } catch (error) {
     console.log("getCase controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+const getAllCases = async (req, res) => {
+  try {
+    // Fetch all cases and populate the 'DentalLab' field
+    const cases = await caseSchema.find().populate("DentalLab");
+
+    cases.forEach(caseItem => {
+      console.log('Case ID:', caseItem.caseID, 'DentalLab ID:', caseItem.DentalLab);
+    });
+
+    // Respond with the populated cases
+    res.status(200).json(cases);
+    console.log('Retrieved cases with populated DentalLab:', cases);
+  } catch (error) {
+    console.log("getAllCases controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -502,7 +526,9 @@ export const updateQC = async (req, res) => {
 export const getCasesByLabName = async (req, res) => {
   try {
     const { labName } = req.query; // Retrieve labName from query parameters
-    const normalizedLabName = labName.trim(); // Normalize the labName input
+    const normalizedLabName = labName?.trim(); // Normalize the labName input
+
+    console.log('normalised labname',normalizedLabName)
 
     // Find the Lab document by its labName
     const lab = await labSchema.findOne({ labName: normalizedLabName });
@@ -521,6 +547,8 @@ export const getCasesByLabName = async (req, res) => {
         path: 'DentalLab',
         select: 'labName', // Only select the labName field from the Lab schema
       });
+
+      
 
     console.log('Cases found:', cases);
 
@@ -558,5 +586,6 @@ export {
   AddTeethData,
   updateRPDFramework,
   updateCustomTray,
+  getAllCases
 };
 
