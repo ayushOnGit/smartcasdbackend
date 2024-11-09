@@ -99,6 +99,8 @@ const caseSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  stlFiles: [String],
+  finishedFiles:[String],
   OrderMessages: [
     {
       message: {

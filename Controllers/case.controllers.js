@@ -21,6 +21,8 @@ const createCase = async (req, res) => {
     Message,
     isApproved = false, // Default value
     OrderMessages = [], // Default to empty array if not provided
+    stlFiles,
+    finishedFiles
   } = req.body;
 
   console.log("Received data:", req.body);
@@ -50,6 +52,8 @@ const createCase = async (req, res) => {
       Message,
       isApproved,
       OrderMessages,
+      stlFiles,
+      finishedFiles
     });
 
     await newCase.save();
@@ -65,40 +69,49 @@ const createCase = async (req, res) => {
 
 /////////////////////////////////////////////////////////////////
 
+export const updateStlFiles = async (req, res) => {
+  const { caseID, stlFiles } = req.body;
 
+  try {
+    // Find the case by caseID
+    const existingCase = await caseSchema.findOne({ caseID });
+    if (!existingCase) {
+      return res.status(404).json({ message: "Case not found" });
+    }
 
-// export const updateDesignerName = async (req, res) => {
-//   try {
-//     const { caseID, designerName } = req.body;
-//     console.log('Request body:', req.body); // Log request body to ensure it's received properly
+    // Update the stlFiles field
+    existingCase.stlFiles = stlFiles;
 
-//     if (!caseID || !designerName) {
-//       return res.status(400).json({ message: "caseID and designerName are required" });
-//     }
+    // Save the updated case
+    await existingCase.save();
+    res.status(200).json({ message: "STL files updated successfully" });
+  } catch (error) {
+    console.log("updateStlFiles controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 
-//     const updatedCase = await caseSchema.findOneAndUpdate(
-//       { caseID: caseID }, 
-//       { DesignerName: designerName }, 
-//       { new: true }
-//     );
+export const updateFinishedFiles = async (req, res) => {
+  const { caseID, finishedFiles } = req.body;
 
-//     if (!updatedCase) {
-//       return res.status(404).json({ message: "Case not found" });
-//     }
+  try {
+    // Find the case by caseID
+    const existingCase = await caseSchema.findOne({ caseID });
+    if (!existingCase) {
+      return res.status(404).json({ message: "Case not found" });
+    }
 
-//     res.status(200).json({
-//       message: "Designer name updated successfully",
-//       updatedCase,
-//     });
-//   } catch (error) {
-//     console.error('Error during designer update:', error); // Log error details
-//     res.status(500).json({
-//       message: "Server error",
-//       error: error.message,
-//     });
-//   }
-// };
+    // Update the finishedFiles field
+    existingCase.finishedFiles = finishedFiles;
 
+    // Save the updated case
+    await existingCase.save();
+    res.status(200).json({ message: "Finished files updated successfully" });
+  } catch (error) {
+    console.log("updateFinishedFiles controller causing error: ", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 
 export const updateDesignerName = async (req, res) => {
   try {
