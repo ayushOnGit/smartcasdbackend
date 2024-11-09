@@ -1,5 +1,5 @@
 import   { createCase,updateQC, getCases,updateRPDFramework,updateCustomTray,getCase, updateCase, deleteCase, sendMesage, approveCase, getApprovedCases, getPendingCases, getCompletedCases, getShippedCases, updateTAT, updateStatus, updateDesignApproval, updateDestination,
-     updateMessage, AddTeethData,updateDesignerName,getCasesByLabName,updateStlFiles,updateFinishedFiles } from '../controllers/case.controllers.js';
+     updateMessage, AddTeethData,updateDesignerName,getCasesByLabName,updateStlFiles,updateFinishedFiles, getAllCases } from '../Controllers/case.controllers.js';
 import express from 'express';
 const router = express.Router();
 
