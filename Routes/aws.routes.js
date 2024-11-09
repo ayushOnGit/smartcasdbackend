@@ -20,7 +20,8 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const randomImageName = (bytes = 32) => {
+const randomImageName = (bytes = 8) => {
+const randomImageName = (bytes = 8) => {
   return crypto.randomBytes(bytes).toString("hex");
 };
 
@@ -36,17 +37,23 @@ const s3 = new S3Client({
 
 
 router.post("/upload", upload.single("file"), async function (req, res, next) {
-console.log(req.file);
+  console.log(req.file);
+
+  // Generate a unique identifier (e.g., current timestamp)
+  const uniqueSuffix = Date.now().toString();
+  
+  // Combine the original filename with the unique suffix
+  const uniqueFileName = `${uniqueSuffix}-${req.file.originalname}`;
+
   const params = {
     Bucket: AWS_BUCKET_NAME,
-    Key: randomImageName(),
+    Key: uniqueFileName,
     Body: req.file.buffer,
     ContentType: req.file.mimetype,
   };
 
   try {
     const data = await s3.send(new PutObjectCommand(params));
-    // Construct a simple response object
     const response = {
       message: "File uploaded successfully",
       location: `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${params.Key}`,
@@ -58,6 +65,7 @@ console.log(req.file);
     res.status(500).send("Error uploading file");
   }
 });
+
 
 router.get("/download/:imageName", async function (req, res, next) {
   const imageName = req.params.imageName;
