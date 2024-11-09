@@ -19,10 +19,9 @@ const createCase = async (req, res) => {
     RPDFramework,
     Abutment,
     Message,
-    isApproved = false, // Default value
-    OrderMessages = [], // Default to empty array if not provided
-    stlFiles,
-    finishedFiles
+    isApproved,
+    OrderMessages,
+    lab,
   } = req.body;
 
   console.log("Received data:", req.body);
@@ -52,8 +51,7 @@ const createCase = async (req, res) => {
       Message,
       isApproved,
       OrderMessages,
-      stlFiles,
-      finishedFiles
+      lab: lab?._id,
     });
 
     await newCase.save();
