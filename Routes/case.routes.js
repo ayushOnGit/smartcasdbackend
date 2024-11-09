@@ -1,13 +1,13 @@
+
 import   { createCase,updateQC, getCases,updateRPDFramework,updateCustomTray,getCase, updateCase, deleteCase, sendMesage, approveCase, getApprovedCases, getPendingCases, getCompletedCases, getShippedCases, updateTAT, updateStatus, updateDesignApproval, updateDestination,
      updateMessage, AddTeethData,updateDesignerName,getCasesByLabName,updateStlFiles,updateFinishedFiles } from '../controllers/case.controllers.js';
 import express from 'express';
 const router = express.Router();
 
 router.post('/create', createCase);
-router.get('/get', getAllCases);
-// router.get('/getCasesbylab', getCasesbylab);
+router.get('/get', getCases);
 router.get('/getcase',getCasesByLabName);
-router.get('/getallcases',getAllCases);
+// router.get('/get', getCases);
 router.get('/get/:caseID', getCase);
 router.put('/update/:caseID', updateCase);
 router.delete('/delete/:caseID', deleteCase);

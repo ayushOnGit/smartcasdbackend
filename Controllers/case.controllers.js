@@ -212,23 +212,23 @@ const getCase = async (req, res) => {
 };
 
 
-const getAllCases = async (req, res) => {
-  try {
-    // Fetch all cases and populate the 'DentalLab' field
-    const cases = await caseSchema.find().populate("DentalLab");
+// const getAllCases = async (req, res) => {
+//   try {
+//     // Fetch all cases and populate the 'DentalLab' field
+//     const cases = await caseSchema.find().populate("DentalLab");
 
-    cases.forEach(caseItem => {
-      console.log('Case ID:', caseItem.caseID, 'DentalLab ID:', caseItem.DentalLab);
-    });
+//     cases.forEach(caseItem => {
+//       console.log('Case ID:', caseItem.caseID, 'DentalLab ID:', caseItem.DentalLab);
+//     });
 
-    // Respond with the populated cases
-    res.status(200).json(cases);
-    console.log('Retrieved cases with populated DentalLab:', cases);
-  } catch (error) {
-    console.log("getAllCases controller causing error: ", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//     // Respond with the populated cases
+//     res.status(200).json(cases);
+//     console.log('Retrieved cases with populated DentalLab:', cases);
+//   } catch (error) {
+//     console.log("getAllCases controller causing error: ", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
 /////////////////////////////////////////////////////////////
 
@@ -597,6 +597,5 @@ export {
   AddTeethData,
   updateRPDFramework,
   updateCustomTray,
-  getAllCases
 };
 
