@@ -22,6 +22,8 @@ const createCase = async (req, res) => {
     isApproved,
     OrderMessages,
     lab,
+    stlFiles,
+    finishedFiles
   } = req.body;
 
   console.log("Received data:", req.body);
@@ -52,6 +54,8 @@ const createCase = async (req, res) => {
       isApproved,
       OrderMessages,
       lab: lab?._id,
+      stlFiles,
+      finishedFiles
     });
 
     await newCase.save();
