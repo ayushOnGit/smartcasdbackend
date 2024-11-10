@@ -20,8 +20,8 @@ const createCase = async (req, res) => {
     Abutment,
     Message,
     isApproved,
-    OrderMessages,
-    lab,
+    OrderMessages = [],
+    
   } = req.body;
 
   console.log("Received data:", req.body);
@@ -51,7 +51,7 @@ const createCase = async (req, res) => {
       Message,
       isApproved,
       OrderMessages,
-      lab: lab?._id,
+      
     });
 
     await newCase.save();
@@ -156,14 +156,14 @@ export const updateDesignerName = async (req, res) => {
 
 const getCases = async (req, res) => {
   try {
-    const cases = await caseSchema.find().populate("lab");
-    // console.log('can we have the cases with lab',cases)
+    const cases = await caseSchema.find().populate("DentalLab").exec();
     res.status(200).json(cases);
   } catch (error) {
     console.log("getCases controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 

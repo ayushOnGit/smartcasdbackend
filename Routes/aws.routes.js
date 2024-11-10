@@ -20,7 +20,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const randomImageName = (bytes = 8) => {
+
 const randomImageName = (bytes = 8) => {
   return crypto.randomBytes(bytes).toString("hex");
 };
