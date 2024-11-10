@@ -20,8 +20,15 @@ const createCase = async (req, res) => {
     Abutment,
     Message,
     isApproved,
+<<<<<<< HEAD
     OrderMessages = [],
     
+=======
+    OrderMessages,
+    lab,
+    stlFiles,
+    finishedFiles
+>>>>>>> daead50f7f84462972fd7686c73ba0b831e585fe
   } = req.body;
 
   console.log("Received data:", req.body);
@@ -51,7 +58,13 @@ const createCase = async (req, res) => {
       Message,
       isApproved,
       OrderMessages,
+<<<<<<< HEAD
       
+=======
+      lab: lab?._id,
+      stlFiles,
+      finishedFiles
+>>>>>>> daead50f7f84462972fd7686c73ba0b831e585fe
     });
 
     await newCase.save();

@@ -1,5 +1,4 @@
 import express from "express";
-
 import multer from "multer";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -19,7 +18,6 @@ const router = express.Router();
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 
 const randomImageName = (bytes = 8) => {
   return crypto.randomBytes(bytes).toString("hex");
@@ -86,6 +84,5 @@ router.get("/download/:imageName", async function (req, res, next) {
     res.status(500).send("Error downloading file");
   }
 });
-
 
 export default router;
