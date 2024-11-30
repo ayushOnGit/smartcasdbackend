@@ -7,25 +7,24 @@ import AWSRoutes from './Routes/aws.routes.js';
 import labRoutes from './Routes/lab.routes.js';
 import userRoutes from './Routes/user.routes.js';
 import bodyParser from 'body-parser';
-
 import cors from 'cors';
+import cookieParser from 'cookie-parser'; // Import cookie-parser
 
 dotenv.config();
-
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-// app.use(bodyParser.json({ limit: '20mb' }));
+app.use(cookieParser());
+
+// Uncomment if needed for large payloads
+app.use(bodyParser.json({ limit: '20mb' }));
 
 app.use('/auth', authRoutes);
 app.use('/case', caseRoutes);
 app.use('/aws', AWSRoutes);
 app.use('/lab', labRoutes);
-app.use('/getme',userRoutes);
-
-
-
+app.use('/getme', userRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World');
