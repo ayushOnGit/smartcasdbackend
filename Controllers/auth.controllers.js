@@ -80,39 +80,69 @@ const signupController = async (req, res) => {
 // };
 
 
-const loginController = async (req, res) => {
-  const { email, password } = req.body;
-  console.log('requested body for login',req.body)
+// const loginController = async (req, res) => {
+//   const { email, password } = req.body;
+//   console.log('requested body for login',req.body)
   
-  try {
-    // Find the user by userName
-    const user = await User.findOne({ email });
+//   try {
+//     // Find the user by userName
+//     const user = await User.findOne({ email });
 
-    // If user is not found
+//     // If user is not found
+//     if (!user) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+//     // Check if the password is valid
+//     // const isPasswordValid = await bcrypt.compare(
+//     //   password,
+//     //   user?.password || ""
+//     // );
+    
+//     const isPasswordValid = await bcrypt.compare(password, user?.password || "");
+//     console.log('Password comparison:', isPasswordValid);  // Log the result of the comparison
+    
+
+//     // Generate JWT and send tokens
+//     generateWebTokens(user._id, res);
+
+//     // Send success response with the role
+//     res.status(200).json({ 
+//       message: "Login successful!", 
+//       role: user.role ,// Fetching the user's role from the database
+//       name : email
+//     });
+    
+//   } catch (error) {
+//     console.log("login controller causing error: ", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
+
+const loginController = async (req, res) => {
+  const { userName, password } = req.body;
+
+  try {
+    const user = await User.findOne({ userName });
+
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check if the password is valid
-    // const isPasswordValid = await bcrypt.compare(
-    //   password,
-    //   user?.password || ""
-    // );
-    
-    const isPasswordValid = await bcrypt.compare(password, user?.password || "");
-    console.log('Password comparison:', isPasswordValid);  // Log the result of the comparison
-    
+    // Ensure password exists before comparing
+    if (!user.password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-    // Generate JWT and send tokens
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
     generateWebTokens(user._id, res);
-
-    // Send success response with the role
-    res.status(200).json({ 
-      message: "Login successful!", 
-      role: user.role ,// Fetching the user's role from the database
-      name : email
-    });
-    
+    res.status(200).json({ message: "Login successful!" });
   } catch (error) {
     console.log("login controller causing error: ", error);
     res.status(500).json({ message: "Internal server error" });
